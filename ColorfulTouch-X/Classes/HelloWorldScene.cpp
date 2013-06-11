@@ -1,21 +1,18 @@
 #include "HelloWorldScene.h"
 #include "SimpleAudioEngine.h"
+#include "MultiSceneLayer.h"
+#include "MultiSceneLayer02.h"
+#include "BackParticle.h"
 
 using namespace cocos2d;
 using namespace CocosDenshion;
 
 CCScene* HelloWorld::scene()
 {
-    // 'scene' is an autorelease object
     CCScene *scene = CCScene::create();
-    
-    // 'layer' is an autorelease object
     HelloWorld *layer = HelloWorld::create();
-
-    // add layer as a child to scene
     scene->addChild(layer);
 
-    // return the scene
     return scene;
 }
 
@@ -46,30 +43,34 @@ bool HelloWorld::init()
     pMenu->setPosition( CCPointZero );
     this->addChild(pMenu, 1);
 
-    /////////////////////////////
-    // 3. add your codes below...
-
-    // add a label shows "Hello World"
-    // create and initialize a label
-    CCLabelTTF* pLabel = CCLabelTTF::create("Hello World", "Thonburi", 34);
-
-    // ask director the window size
+    /* Label */
+    CCLabelTTF* pLabel = CCLabelTTF::create("Colorful Touch-x", "Hevetica-BoldOblique", 100);
     CCSize size = CCDirector::sharedDirector()->getWinSize();
-
-    // position the label on the center of the screen
-    pLabel->setPosition( ccp(size.width / 2, size.height - 20) );
-
-    // add the label as a child to this layer
+    pLabel->setPosition( ccp(size.width / 2, size.height/2+100) );
     this->addChild(pLabel, 1);
-
-    // add "HelloWorld" splash screen"
-    CCSprite* pSprite = CCSprite::create("HelloWorld.png");
-
-    // position the sprite on the center of the screen
+    
+    /* Image */
+    CCSprite* pSprite = CCSprite::create("space_bg8.jpg");
     pSprite->setPosition( ccp(size.width/2, size.height/2) );
-
-    // add the sprite as a child to this layer
     this->addChild(pSprite, 0);
+    
+    /* Play the Game */
+    CCMenuItemFont::setFontName("Hevetica-BoldOblique");
+    CCMenuItemFont::setFontSize(50);
+    CCMenuItemFont* item = CCMenuItemFont::create("play the game", this, menu_selector(HelloWorld::PlayTheGame));
+    CCMenu *menu = CCMenu::menuWithItem(item);
+    menu->setPosition(CCPointMake(size.width/2, size.height/2-150));
+    CCFadeTo* fadeIn = CCFadeTo::actionWithDuration(1.0f, 127);
+    CCFadeTo* fadeOut = CCFadeTo::actionWithDuration(1.0f, 255);
+    CCSequence *pulseSequence = CCSequence::actionOneTwo(fadeIn, fadeOut);
+    CCRepeatForever *repeat = CCRepeatForever::actionWithAction(pulseSequence);
+    menu->runAction(repeat);
+    this->addChild(menu,1);
+    
+    /* Back Particle */
+    BackParticle *backParticle = (BackParticle *)BackParticle::create();
+    this->addChild(backParticle);
+
     
     return true;
 }
@@ -81,4 +82,12 @@ void HelloWorld::menuCloseCallback(CCObject* pSender)
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
     exit(0);
 #endif
+}
+
+
+void HelloWorld::PlayTheGame(CCObject* pSender)
+{
+    CCScene* pScene = MultiSceneLayer02::scene();
+    CCDirector::sharedDirector()->replaceScene(pScene);
+    
 }
